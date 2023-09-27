@@ -1,0 +1,18 @@
+site_name: MkDocs Ubuntu Theme
+site_name_short: Ubuntu Theme
+site_url: http://organizer.ubucon.asia/
+site_description: MkDocs Ubuntu Theme
+site_author: Youngbin Han
+
+repo_url: https://github.com/ubucon-asia/mkdocs-theme-ubuntu
+
+copyright: Copyright &copy; 2023 Youngbin Han (ybhan at ubuntu.com)
+
+theme:
+    name: ubuntu
+
+nav:
+    - Home: index.md
+
+plugins:
+    - search
