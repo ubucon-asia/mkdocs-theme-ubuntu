@@ -5,7 +5,8 @@ site_description: MkDocs Ubuntu Theme
 site_author: Youngbin Han
 
 repo_url: https://github.com/ubucon-asia/mkdocs-theme-ubuntu
-
+repo_name: ubucon-asia/mkdocs-theme-ubuntu
+contact_email: ybhan@ubuntu.com
 copyright: Copyright &copy; 2023 Youngbin Han (ybhan at ubuntu.com)
 
 theme:
