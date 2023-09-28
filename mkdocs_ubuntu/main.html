@@ -195,7 +195,7 @@
                 keys: [
                     'title',
                     'contents',
-                    'contents_html'
+                    // 'contents_html'
                 ]
             });
         }
@@ -222,6 +222,8 @@
             resultTarget.innerHTML = resultHtml;
         })
     </script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
+	<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     {% for path in config.extra_javascript %}
     <script src="{{ path | url }}"></script>
     {% endfor %}
