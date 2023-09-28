@@ -6,7 +6,7 @@ A MkDocs Theme build with [Vanilla framework](https://vanillaframework.io/)
 
 Simply set theme property in `mkdocs.yml` as follows
 
-```yml
+```yaml
 ...
 theme:
     name: ubuntu
@@ -14,7 +14,7 @@ theme:
 
 It's also required to set `site_name_short` for title in header. And `repo_name` for hyperlink label of your repository URL.
 
-```yml
+```yaml
 site_name: MkDocs Ubuntu Theme
 site_name_short: Ubuntu Theme # Title for header
 ...
