@@ -1,6 +1,7 @@
 site_name: MkDocs Ubuntu Theme
 site_name_short: Ubuntu Theme
 site_url: http://organizer.ubucon.asia/
+site_base_url: /
 site_description: MkDocs Ubuntu Theme
 site_author: Youngbin Han
 
@@ -13,7 +14,10 @@ theme:
     name: ubuntu
 
 nav:
-    - Home: index.md
+    - Home:
+      - index.md
+      - Submenu: 
+        - markup.md
 
 plugins:
     - search

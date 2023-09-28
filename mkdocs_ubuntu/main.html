@@ -114,20 +114,21 @@
                         </div>
                         {% for nav_item in nav %}
                         {% if nav_item.active %}
-                        <h3>{{ nav_item.title }}</h3>
+                        <h3 class="p-side-navigation__heading">{{ nav_item.title }}</h3>
                         {% if nav_item.children %}
-                        <ul>
+                        <ul class="p-side-navigation__list">
                             {% for nav_item in nav_item.children %}
-                            <li>
+                            <li class="p-side-navigation__item">
                                 {% if nav_item.children %}
-                                <a>{{ nav_item.title }}</a>
-                                <ul>
+                                <a class="p-side-navigation__link">{{ nav_item.title }}</a>
+                                <ul class="p-side-navigation__list">
                                     {% for nav_item in nav_item.children %}
-                                    <li><a href="{{ nav_item.url|url }}">{{ nav_item.title }}</a></li>
+                                    <li class="p-side-navigation__item"><a class="p-side-navigation__link"
+                                            href="{{ nav_item.url|url }}">{{ nav_item.title }}</a></li>
                                     {% endfor %}
                                 </ul>
                                 {% else %}
-                                <a href="{{ nav_item.url|url }}">{{ nav_item.title }}</a>
+                                <a class="p-side-navigation__link" href="{{ nav_item.url|url }}">{{ nav_item.title }}</a>
                                 {% endif %}
                             </li>
                             {% endfor %}
