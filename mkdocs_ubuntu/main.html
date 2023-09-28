@@ -98,9 +98,9 @@
     <div class="p-strip is-shallow">
         <div class="row">
             <aside class="col-3">
-                <nav class="p-side-navigation--raw-html is-sticky" id="drawer" aria-label="Table of contents">
+                <nav class="p-side-navigation--accordion is-sticky" id="drawer" aria-label="Table of contents">
                     <a href="#drawer" class="p-side-navigation__toggle js-drawer-toggle" aria-controls="drawer">
-                        Subdocuments and index
+                        Contents
                     </a>
 
                     <div class="p-side-navigation__overlay js-drawer-toggle" aria-controls="drawer"></div>
@@ -109,7 +109,7 @@
                         <div class="p-side-navigation__drawer-header">
                             <a href="#" class="p-side-navigation__toggle--in-drawer js-drawer-toggle"
                                 aria-controls="drawer">
-                                Subdocuments and index
+                                Contents
                             </a>
                         </div>
                         {% for nav_item in nav %}
@@ -120,15 +120,18 @@
                             {% for nav_item in nav_item.children %}
                             <li class="p-side-navigation__item">
                                 {% if nav_item.children %}
-                                <a class="p-side-navigation__link">{{ nav_item.title }}</a>
-                                <ul class="p-side-navigation__list">
+                                <!-- <a class="p-side-navigation__link">{{ nav_item.title }}</a> -->
+                                <button class="p-side-navigation__accordion-button" aria-expanded="false">{{
+                                    nav_item.title }}</button>
+                                <ul class="p-side-navigation__list" aria-expanded="false">
                                     {% for nav_item in nav_item.children %}
                                     <li class="p-side-navigation__item"><a class="p-side-navigation__link"
                                             href="{{ nav_item.url|url }}">{{ nav_item.title }}</a></li>
                                     {% endfor %}
                                 </ul>
                                 {% else %}
-                                <a class="p-side-navigation__link" href="{{ nav_item.url|url }}">{{ nav_item.title }}</a>
+                                <a class="p-side-navigation__link" href="{{ nav_item.url|url }}">{{ nav_item.title
+                                    }}</a>
                                 {% endif %}
                             </li>
                             {% endfor %}
@@ -137,15 +140,16 @@
                         {% endif %}
                         {% endfor %}
 
-                        <h3>Index</h3>
-                        <ul>
+                        <h3 class="p-side-navigation__heading">Index</h3>
+                        <ul class="p-side-navigation__list">
                             {% for toc_item in page.toc %}
-                            <li>
-                                <a href="{{ toc_item.url }}">{{ toc_item.title }}</a>
+                            <li class="p-side-navigation__item">
+                                <a class="p-side-navigation__link" href="{{ toc_item.url }}">{{ toc_item.title }}</a>
                                 {% if toc_item.children %}
-                                <ul>
+                                <ul class="p-side-navigation__list">
                                     {% for toc_item in toc_item.children %}
-                                    <li><a href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
+                                    <li class="p-side-navigation__item"><a class="p-side-navigation__link"
+                                            href="{{ toc_item.url }}">{{ toc_item.title }}</a></li>
                                     {% endfor %}
                                 </ul>
                                 {% endif %}
@@ -221,9 +225,240 @@
             }
             resultTarget.innerHTML = resultHtml;
         })
+
+
+    </script>
+    <script>
+        // small script to make the example interactive
+        // not intended to be used in projects
+        var links = [].slice.call(document.querySelectorAll('.p-side-navigation__link, .p-side-navigation--raw-html li > a'));
+
+        links.forEach(function (link) {
+            link.addEventListener('click', function () {
+                var active = [].slice.call(document.querySelectorAll('.is-active, [aria-current]'));
+                active.forEach(function (link) {
+                    link.classList.remove('is-active');
+                    link.removeAttribute('aria-current');
+                });
+                this.setAttribute('aria-current', 'page');
+                this.blur();
+            });
+        });
+        // This is not a production ready code, just serves as an example
+        // of how the focus should be controlled within the sidenav drawer.
+        var expandedSidenavContainer = null;
+        var lastFocus = null;
+        var ignoreFocusChanges = false;
+        var focusAfterClose = null;
+
+        // Traps the focus within the currently expanded sidenav drawer
+        function trapFocus(event) {
+            if (ignoreFocusChanges || !expandedSidenavContainer) return;
+            // skip the focus trap if the sidenav is not in the expanded status (large screens)
+            if (!expandedSidenavContainer.classList.contains('is-drawer-expanded')) return;
+            var sidenavDrawer = expandedSidenavContainer.querySelector('.p-side-navigation__drawer');
+
+            if (sidenavDrawer.contains(event.target)) {
+                lastFocus = event.target;
+            } else {
+                focusFirstDescendant(sidenavDrawer);
+                if (lastFocus == document.activeElement) {
+                    focusLastDescendant(sidenavDrawer);
+                }
+                lastFocus = document.activeElement;
+            }
+        }
+
+        // Attempts to focus given element
+        function attemptFocus(child) {
+            if (child.focus) {
+                ignoreFocusChanges = true;
+                child.focus();
+                ignoreFocusChanges = false;
+                return document.activeElement === child;
+            }
+
+            return false;
+        }
+
+        // Focuses first child element
+        function focusFirstDescendant(element) {
+            for (var i = 0; i < element.childNodes.length; i++) {
+                var child = element.childNodes[i];
+                if (attemptFocus(child) || focusFirstDescendant(child)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // Focuses last child element
+        function focusLastDescendant(element) {
+            for (var i = element.childNodes.length - 1; i >= 0; i--) {
+                var child = element.childNodes[i];
+                if (attemptFocus(child) || focusLastDescendant(child)) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        /**
+          Toggles the expanded/collapsed classes on side navigation element.
+        
+          @param {HTMLElement} sideNavigation The side navigation element.
+          @param {Boolean} show Whether to show or hide the drawer.
+        */
+        function toggleDrawer(sideNavigation, show) {
+            expandedSidenavContainer = show ? sideNavigation : null;
+            const toggleButtonOutsideDrawer = sideNavigation.querySelector('.p-side-navigation__toggle, .js-drawer-toggle');
+            const toggleButtonInsideDrawer = sideNavigation.querySelector('.p-side-navigation__toggle--in-drawer');
+
+            if (sideNavigation) {
+                if (show) {
+                    sideNavigation.classList.remove('is-drawer-collapsed');
+                    sideNavigation.classList.add('is-drawer-expanded');
+
+                    toggleButtonInsideDrawer.focus();
+                    toggleButtonOutsideDrawer.setAttribute('aria-expanded', true);
+                    toggleButtonInsideDrawer.setAttribute('aria-expanded', true);
+                    focusFirstDescendant(sideNavigation);
+                    focusAfterClose = toggleButtonOutsideDrawer;
+                    document.addEventListener('focus', trapFocus, true);
+                } else {
+                    sideNavigation.classList.remove('is-drawer-expanded');
+                    sideNavigation.classList.add('is-drawer-collapsed');
+
+                    toggleButtonOutsideDrawer.focus();
+                    toggleButtonOutsideDrawer.setAttribute('aria-expanded', false);
+                    toggleButtonInsideDrawer.setAttribute('aria-expanded', false);
+                    if (focusAfterClose && focusAfterClose.focus) {
+                        focusAfterClose.focus();
+                    }
+                    document.removeEventListener('focus', trapFocus, true);
+                }
+            }
+        }
+
+        // throttle util (for window resize event)
+        var throttle = function (fn, delay) {
+            var timer = null;
+            return function () {
+                var context = this,
+                    args = arguments;
+                clearTimeout(timer);
+                timer = setTimeout(function () {
+                    fn.apply(context, args);
+                }, delay);
+            };
+        };
+
+        /**
+          Attaches event listeners for the side navigation toggles
+          @param {HTMLElement} sideNavigation The side navigation element.
+        */
+        function setupSideNavigation(sideNavigation) {
+            var toggles = [].slice.call(sideNavigation.querySelectorAll('.js-drawer-toggle'));
+            var drawerEl = sideNavigation.querySelector('.p-side-navigation__drawer');
+
+            // hide navigation drawer on small screens
+            sideNavigation.classList.add('is-drawer-hidden');
+
+            // setup drawer element
+            drawerEl.addEventListener('animationend', () => {
+                if (!sideNavigation.classList.contains('is-drawer-expanded')) {
+                    sideNavigation.classList.add('is-drawer-hidden');
+                }
+            });
+
+            window.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') {
+                    toggleDrawer(sideNavigation, false);
+                }
+            });
+
+            // setup toggle buttons
+            toggles.forEach(function (toggle) {
+                toggle.addEventListener('click', function (event) {
+                    event.preventDefault();
+
+                    if (sideNavigation) {
+                        sideNavigation.classList.remove('is-drawer-hidden');
+                        toggleDrawer(sideNavigation, !sideNavigation.classList.contains('is-drawer-expanded'));
+                    }
+                });
+            });
+
+            // hide side navigation drawer when screen is resized
+            window.addEventListener(
+                'resize',
+                throttle(function () {
+                    toggles.forEach((toggle) => {
+                        return toggle.setAttribute('aria-expanded', false);
+                    });
+                    // remove expanded/collapsed class names to avoid unexpected animations
+                    sideNavigation.classList.remove('is-drawer-expanded');
+                    sideNavigation.classList.remove('is-drawer-collapsed');
+                    sideNavigation.classList.add('is-drawer-hidden');
+                }, 10)
+            );
+        }
+
+        /**
+          Attaches event listeners for all the side navigations in the document.
+          @param {String} sideNavigationSelector The CSS selector matching side navigation elements.
+        */
+        function setupSideNavigations(sideNavigationSelector) {
+            // Setup all side navigations on the page.
+            var sideNavigations = [].slice.call(document.querySelectorAll(sideNavigationSelector));
+
+            sideNavigations.forEach(setupSideNavigation);
+        }
+
+        setupSideNavigations('.p-side-navigation, [class*="p-side-navigation--"]');
+        // Setup expand toggles for all side navigations on the page.
+
+        function setupSideNavigationExpandToggle(toggle) {
+            const isExpanded = toggle.getAttribute('aria-expanded') === 'true';
+            if (!isExpanded) {
+                toggle.setAttribute('aria-expanded', isExpanded);
+            }
+            const item = toggle.closest('.p-side-navigation__item');
+            const link = item.querySelector('.p-side-navigation__link');
+            const nestedList = item.querySelector('.p-side-navigation__list');
+            if (!link?.hasAttribute('aria-expanded')) {
+                link.setAttribute('aria-expanded', isExpanded);
+            }
+            if (!nestedList?.hasAttribute('aria-expanded')) {
+                nestedList.setAttribute('aria-expanded', isExpanded);
+            }
+        }
+
+        function handleExpandToggle(event) {
+            const item = event.currentTarget.closest('.p-side-navigation__item');
+            const button = item.querySelector('.p-side-navigation__expand, .p-side-navigation__accordion-button');
+            const link = item.querySelector('.p-side-navigation__link');
+            const nestedList = item.querySelector('.p-side-navigation__list');
+
+            [button, link, nestedList].forEach((el) => {
+                el.setAttribute('aria-expanded', el.getAttribute('aria-expanded') === 'true' ? 'false' : 'true');
+            });
+        }
+
+        function setupSideNavigationExpands() {
+            var expandToggles = document.querySelectorAll('.p-side-navigation__expand, .p-side-navigation__accordion-button');
+            expandToggles.forEach((toggle) => {
+                setupSideNavigationExpandToggle(toggle);
+                toggle.addEventListener('click', (e) => {
+                    handleExpandToggle(e);
+                });
+            });
+        }
+
+        setupSideNavigationExpands();
     </script>
     <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/prism.min.js"></script>
-	<script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/prismjs@1.29.0/plugins/autoloader/prism-autoloader.min.js"></script>
     {% for path in config.extra_javascript %}
     <script src="{{ path | url }}"></script>
     {% endfor %}
