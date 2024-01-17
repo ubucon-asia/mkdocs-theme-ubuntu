@@ -9,7 +9,7 @@ repo_url: https://github.com/ubucon-asia/mkdocs-theme-ubuntu
 repo_name: ubucon-asia/mkdocs-theme-ubuntu
 contact_email: ybhan@ubuntu.com
 copyright: Copyright &copy; 2023 Youngbin Han (ybhan at ubuntu.com)
-edit_link_prefix: https://github.com/ubucon-asia/mkdocs-ubuntu/edit/main
+edit_uri: /blob/main/docs
 
 theme:
     name: ubuntu
